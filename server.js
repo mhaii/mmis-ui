@@ -1,16 +1,47 @@
+'use strict';
 import express from 'express';
+
 import router from './routes/index';
+import api from './routes/api';
+
+import path from 'path';
 
 let app = express();
 
-app.use('/bin', express.static('./bin'));
-app.use('/stylesheets', express.static('./public/stylesheets'));
-app.use('/images', express.static('./public/images'));
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
+
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', router);
-app.use('/view/*', router);
+app.use('/api', api);
+
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+app.use((req, res, next) => {
+    let err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+});
+
+app.use((err, req, res, next) => {
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+    res.status(err.status || 500);
+    res.render('layout/error');
+});
+
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 
 app.listen(3000, function () {
-	console.log('Hello World listening on port 3000!');
+    console.log('Hello World listening on port 3000!');
 });

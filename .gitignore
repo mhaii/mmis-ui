@@ -1,7 +1,6 @@
 node_modules
+bower_components
 
 .idea
 
-package-lock.json
-
-server.bundle.js
+*.bundle.js
